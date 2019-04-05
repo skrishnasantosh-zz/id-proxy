@@ -1,0 +1,4 @@
+LIBRARY Platform
+EXPORTS
+	LoadPlatform @1
+	UnloadPlatform @2
