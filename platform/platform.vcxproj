@@ -169,7 +169,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="updater.h" />
-    <ClInclude Include="browser.h" />
     <ClInclude Include="platform.h" />
   </ItemGroup>
   <ItemGroup>

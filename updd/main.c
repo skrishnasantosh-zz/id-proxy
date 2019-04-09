@@ -7,7 +7,9 @@
 
 int main(int argc, char** argv)
 {
-	ptError_t error = P_ERROR(0);
+	SetProcessDPIAware();
+
+	pError_t error = P_ERROR(0);
 
 	int ok = (P_ERROR_OK(error));
 
@@ -21,7 +23,8 @@ int main(int argc, char** argv)
 	platform.browserFrame.events.onError = NULL;
 
 	platform.browserFrame.ShowBrowserFrame(&platform, GetModuleHandle(NULL), NULL);
-	
 
-	UnloadPlatform(&platform);
+	platform.Unload(&platform);
+
+	return 0;
 }

@@ -27,10 +27,10 @@ extern "C" {
 
 	struct AutoUpdate
 	{
-		ptError_t (*CheckForUpdates)(struct _platform_t* platform, struct AutoUpdateMetaInf* meta, enum peSupportedPlatforms os, ptVersion_t osVersion, ptVersion_t productVersion);
-		ptError_t (*CheckForLatestUpdates)(struct _platform_t* platform, struct AutoUpdateMetaInf* meta, enum peSupportedPlatforms os, ptVersion_t osVersion);
-		ptError_t (*InstallUpdate)(struct _platform_t* platform, struct AutoUpdateFileInf* file, pfnProgressNotifier_t progressNotifier);
-		ptError_t (*RollbackUpdates)(struct _platform_t* platform, struct AutoUpdateMetaInf* file, pfnProgressNotifier_t progressNotifier);
+		pError_t (*CheckForUpdates)(struct _platform_t* platform, struct AutoUpdateMetaInf* meta, enum peSupportedPlatforms os, ptVersion_t osVersion, ptVersion_t productVersion);
+		pError_t (*CheckForLatestUpdates)(struct _platform_t* platform, struct AutoUpdateMetaInf* meta, enum peSupportedPlatforms os, ptVersion_t osVersion);
+		pError_t (*InstallUpdate)(struct _platform_t* platform, struct AutoUpdateFileInf* file, pfnProgressNotifier_t progressNotifier);
+		pError_t (*RollbackUpdates)(struct _platform_t* platform, struct AutoUpdateMetaInf* file, pfnProgressNotifier_t progressNotifier);
 	};
 
 #ifdef __cplusplus

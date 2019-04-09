@@ -16,9 +16,16 @@
 
 #define FILE_STRLEN 1024
 
-typedef void (*pInitializePlatform_t)(Platform_t* platform);
+typedef BOOL (*pInitializePlatform_t)(Platform_t* platform);
 
-void LoadPlatform(Platform_t* platform, void* appInstanceHandle)
+void UnloadPlatform(Platform_t* platform);
+
+struct _internal
+{
+	HMODULE library;
+};
+
+pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 {
 	HANDLE hInstance = (HINSTANCE)appInstanceHandle;
 	TCHAR filePath[FILE_STRLEN] = { 0 };
@@ -28,6 +35,12 @@ void LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 
 	if (platform == NULL)
 		return;
+
+	memset(platform, 0, sizeof(Platform_t));
+
+	platform->_internal = calloc(1, sizeof(struct _internal));
+	if (platform->_internal == NULL)
+		return P_ERROR(P_ERR_INSUFFICIENT_MEMORY);
 		
 	GetModuleFileName(hInstance, filePath, FILE_STRLEN);
 
@@ -40,20 +53,27 @@ void LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	{
 		FARPROC proc = GetProcAddress(hLib, "InitializePlatform");
 		pInitializePlatform_t pInitFunc = (pInitializePlatform_t)proc;
-		pInitFunc(platform);
-
-		platform->internals.moduleHandle = hLib;
+		pInitFunc(platform);		
 	}
 
-	return platform;	
+	platform->Unload = UnloadPlatform;
+
+	return P_ERROR(0);
 }
 
 void UnloadPlatform(Platform_t* platform)
 {
-	if (platform->internals.moduleHandle != NULL)
-	{
-		FreeLibrary(platform->internals.moduleHandle);
-	}
+	if (platform->browserFrame.Unload != NULL)	
+		platform->browserFrame.Unload(platform);	
+
+	if (platform->restApi.Unload != NULL)
+		platform->restApi.Unload(platform);
+
+	if (platform->strings.Unload != NULL)
+		platform->strings.Unload(platform);
+
+	if (platform->_internal != NULL)	
+		FreeLibrary((HMODULE)platform->_internal);	
 }
 
 #endif //PLATFORM_WINDOWS
