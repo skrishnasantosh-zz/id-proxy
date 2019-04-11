@@ -6,16 +6,22 @@ struct _internal
 	AdBrowserFrame* frame;
 };
 
-pError_t ShowBrowserFrame(struct _platform_t* platform, void* appHandle, pUtf8_t u8UrlString)
+pError_t ShowBrowserFrame(struct _platform_t* platform, void* appHandle, void *parentWindow, pUtf8_t u8UrlString)
 {
 	struct _internal* in = static_cast<struct _internal*>(platform->browserFrame._internal);
 	if (in->frame != NULL)
 	{
-		in->frame->OpenBrowser(L"");
-		return P_ERROR(0);
+		HWND parent = NULL;
+
+		if (!::IsBadReadPtr(parentWindow, sizeof(HWND)))		
+			parent = (HWND)parentWindow;		
+
+		in->frame->OpenBrowser(parent, FALSE, L"");
+
+		return P_SUCCESS;
 	}
 
-	return P_ERROR(-1);
+	return P_ERROR_BROWSER_DISPLAY;
 }
 
 pError_t UnloadBrowserFrame(struct _platform_t* platform)
@@ -28,13 +34,13 @@ pError_t UnloadBrowserFrame(struct _platform_t* platform)
 
 		delete platform->browserFrame._internal;
 
-		return P_ERROR(0);
+		return P_SUCCESS;
 	}
 
-	return P_ERROR(-1);
+	return P_ERROR_BROWSER_CLEANUP;
 }
 
-extern "C" pError_t InitializePlatform(Platform_t * platform)
+pError_t InitializePlatform(Platform_t * platform)
 {
 	HMODULE hModule = GetModuleHandle(NULL);
 
@@ -43,10 +49,13 @@ extern "C" pError_t InitializePlatform(Platform_t * platform)
 
 	struct _internal* in = static_cast<struct _internal*>(platform->browserFrame._internal);
 
+	if (in == NULL)
+		return P_ERROR_PLATFORM_INIT;
+
 	in->frame = frame;
 	platform->browserFrame.ShowBrowserFrame = ShowBrowserFrame;
 
 	platform->browserFrame.Unload = UnloadBrowserFrame;
 
-	return TRUE;
+	return P_SUCCESS;
 }

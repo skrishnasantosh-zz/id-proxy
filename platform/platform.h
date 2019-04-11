@@ -29,9 +29,22 @@
 #define P_REST_QPARAM_STRLEN 48
 #define P_REST_QVALUE_STRLEN 1024
 
+
 #define P_ERROR(errC) (errC)
 #define P_ERROR_OK(x) (x == 0)
 #define P_ERROR_FAIL (!P_ERROR_OK)
+
+#define P_SUCCESS P_ERROR(0x00)
+
+#define P_ERROR_PLATFORM_INIT P_ERROR(0x01)
+#define P_ERROR_PLATFORM_UNINIT P_ERROR(0x02)
+#define P_ERROR_LIBLOAD P_ERROR(0x03)
+#define P_ERROR_BROWSER P_ERROR(0x04)
+#define P_ERROR_BROWSER_INIT P_ERROR(0x0401)
+#define P_ERROR_BROWSER_NAVIGATE P_ERROR(0x0402)
+#define P_ERROR_BROWSER_DISPLAY P_ERROR(0x0403)
+#define P_ERROR_BROWSER_CLEANUP P_ERROR(0x9999) /* All cleanups have this error code */
+#define P_ERROR_WINDOW P_ERROR(0x05)
 
 #define P_FALSE (0)
 #define P_TRUE (!P_FALSE)
@@ -92,7 +105,7 @@ extern "C" {
 
 	struct WebBrowserFrame
 	{
-		pError_t (*ShowBrowserFrame)(struct _platform_t* platform, void* appHandle, pUtf8_t u8UrlString);
+		pError_t (*ShowBrowserFrame)(struct _platform_t* platform, void* appHandle, void* parentWindow, pUtf8_t u8UrlString);
 		pError_t (*CloseBrowserFrame)(struct _platform_t* platform);		
 
 		struct WebBrowserEventHandler events;

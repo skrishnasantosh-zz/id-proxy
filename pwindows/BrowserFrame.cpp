@@ -4,15 +4,30 @@
 #include <string>
 #include <locale>
 #include <codecvt>
+#include <ExDispid.h>
 
 #define BROWSER_FRAME_WIDTH 1024
 #define BROWSER_FRAME_HEIGHT 768
 
-const wchar_t* FRAME_CLASS = L"IdProxyClass";
+typedef struct {
+	DLGITEMTEMPLATE dlgItem; 
+	WORD ch, c, t, dummy, cd;
+} DialogItem;
 
+typedef struct _tDlgData{
+	DLGTEMPLATE dlgData; 
+	WORD m, c;
+	WCHAR title[8];
+	WORD pt;
+	WCHAR font[14];
+} Dialog;
 
-AdBrowserFrame::AdBrowserFrame(Platform_t* platform, HINSTANCE hInstance)	
-	:m_hInstance(NULL), m_hWnd(NULL), m_lastUrl(L""), m_msg({0}), m_wc({0}), m_webBrowser(NULL), m_windowTitle(L"")
+std::string IIDToString(REFIID riid);
+const IID IID_IDocHostUIHandler = { 0xbd3f23c0, 0xd43e, 0x11CF, {0x89, 0x3b, 0x00, 0xaa, 0x00, 0xbd, 0xce, 0x1a} }; //COM Identifier for IDocHostUIHandler
+
+AdBrowserFrame::AdBrowserFrame(Platform_t* platform, HINSTANCE hInstance)
+	:m_hInstance(NULL), m_hWnd(NULL), m_lastUrl(L""), m_msg({ 0 }), m_wc({ 0 }), m_webBrowser(NULL), m_windowTitle(L""), m_initComplete(FALSE),
+	 m_docHostUiHandler(NULL)
 {
 	if (platform == NULL)
 	{
@@ -21,55 +36,29 @@ AdBrowserFrame::AdBrowserFrame(Platform_t* platform, HINSTANCE hInstance)
 
 	m_platform = platform;
 	m_hInstance = hInstance;
+
+	if (SUCCEEDED(::OleInitialize(NULL)))
+		m_initComplete = TRUE;
 }
 
 AdBrowserFrame::~AdBrowserFrame()
 {
-	UnregisterClass(FRAME_CLASS, m_hInstance);
+	if (m_initComplete)
+		::OleUninitialize();	
 }
 
-BOOL AdBrowserFrame::OpenBrowser(const wchar_t* urlStr)
-{
-	WNDCLASSEX		wc;
-	int width, height, top, left;
-	UINT dpiX, dpiY;
-	RECT bounds = { 0 };
-
-	ZeroMemory(&wc, sizeof(WNDCLASSEX));
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.hInstance = m_hInstance;
-	wc.lpfnWndProc = FrameProc;
-	wc.lpszClassName = FRAME_CLASS;
-	RegisterClassEx(&wc);
-
-	HWND hWndDesktop = ::GetDesktopWindow();	
-
-	auto dpi = ::GetThreadDpiAwarenessContext();
+BOOL AdBrowserFrame::OpenBrowser(HWND parent, BOOL modal, const wchar_t* urlStr)
+{	
 	::SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+	
+	Dialog dtp = { {DS_MODALFRAME | DS_3DLOOK | DS_SETFONT | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_VISIBLE, 0, 0/*Zero Sub Elements*/, 0, 0, 478, 296},
+		0, 0, L"Preview", 8, L"MS Sans Serif"};
 
-	m_hWnd = CreateWindowEx(0, FRAME_CLASS, m_windowTitle.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hWndDesktop, NULL, m_hInstance, 0);
+	DialogBoxIndirect(m_hInstance, (DLGTEMPLATE*)& dtp, parent, FrameProc);
 
-	::SetThreadDpiAwarenessContext(dpi);
+	::SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);	
 
-	if (m_hWnd)
-	{	
-		DpiReCalculateBounds(m_hWnd, &bounds);
-
-		SetWindowPos(m_hWnd, /*HWND_TOPMOST*/0, bounds.left, bounds.top, bounds.right, bounds.bottom, SWP_SHOWWINDOW);
-		//DisplayHTMLPage(m_hWnd, TEXT("https://accounts-dev.autodesk.com/"));
-
-		ShowWindow(m_hWnd, SW_SHOWDEFAULT);
-		UpdateWindow(m_hWnd);
-	}
-
-	while (GetMessage(&m_msg, m_hWnd, 0, 0) == 1)
-	{
-		TranslateMessage(&m_msg);
-		DispatchMessage(&m_msg);
-	}
-
-	return TRUE;
+  return TRUE;
 }
 
 LRESULT CALLBACK AdBrowserFrame::FrameProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -78,9 +67,10 @@ LRESULT CALLBACK AdBrowserFrame::FrameProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 	{
 	case WM_DPICHANGED:
 		RECT rect;
-		DpiReCalculateBounds(hWnd, &rect);
+		DpiReCalculateBounds(hWnd, &rect);		
 		SetWindowPos(hWnd, /*HWND_TOPMOST*/0, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW);
-		break;
+		break;	
+
 	}
 	
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -122,3 +112,60 @@ void AdBrowserFrame::DpiReCalculateBounds(HWND hWnd, RECT* pRect)
 	pRect->right = width;
 	pRect->bottom = height;	
 }
+
+STDMETHODIMP AdBrowserFrame::QueryInterface(REFIID riid, void** pObject)
+{
+	std::string s = IIDToString(riid);
+
+	if (!memcmp((const void*)& riid, (const void*)& IID_IUnknown, sizeof(GUID)) ||
+		!memcmp((const void*)& riid, (const void*)& IID_IDispatch, sizeof(GUID)) ||
+		!memcmp((const void*)& riid, (const void*)& IID_IDocHostUIHandler, sizeof(GUID))) 
+	{
+		*pObject = m_docHostUiHandler;
+		return S_OK;
+	}
+
+	pObject = NULL;
+
+	return E_NOINTERFACE;
+}
+
+STDMETHODIMP AdBrowserFrame::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS* pDispParams, VARIANT* pVarResult, EXCEPINFO* pExcepInfo, unsigned int* puArgErr)
+{
+	
+	return NOERROR;
+}
+
+pError_t AdBrowserFrame::InplaceBrowserIe()
+{
+	IWebBrowser2* webBrowser2;
+	RECT             rect;
+
+	return P_ERROR_BROWSER_INIT;
+}
+
+pError_t AdBrowserFrame::Resize(DWORD width, DWORD height)
+{
+	return pError_t();
+}
+
+pError_t AdBrowserFrame::SetupSink()
+{
+	return pError_t();
+}
+
+pError_t AdBrowserFrame::SetUrl()
+{
+	return pError_t();
+}
+
+//Helpers
+
+std::string IIDToString(REFIID riid) {
+	char buf[34] = { 0 };
+
+	for (int i = 0; i < 16; i++) 
+		sprintf_s(buf + i * 2, 33, "%02x", *(((char*)& riid) + i));	
+
+	return buf;
+};

@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BrowserFrame.cpp" />
+    <ClCompile Include="EventSink.cpp" />
     <ClCompile Include="Init.cpp" />
     <ClCompile Include="Strings.cpp" />
   </ItemGroup>
