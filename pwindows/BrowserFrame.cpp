@@ -1,5 +1,6 @@
 
 #include "BrowserFrame.h"
+#include <winuser.h>
 #include <iostream>
 #include <string>
 #include <locale>
@@ -8,6 +9,8 @@
 
 #define BROWSER_FRAME_WIDTH 1024
 #define BROWSER_FRAME_HEIGHT 768
+
+AdBrowserFrame* g_frame;
 
 typedef struct {
 	DLGITEMTEMPLATE dlgItem; 
@@ -26,12 +29,14 @@ std::string IIDToString(REFIID riid);
 const IID IID_IDocHostUIHandler = { 0xbd3f23c0, 0xd43e, 0x11CF, {0x89, 0x3b, 0x00, 0xaa, 0x00, 0xbd, 0xce, 0x1a} }; //COM Identifier for IDocHostUIHandler
 
 AdBrowserFrame::AdBrowserFrame(Platform_t* platform, HINSTANCE hInstance)
-	:m_hInstance(NULL), m_hWnd(NULL), m_lastUrl(L""), m_msg({ 0 }), m_wc({ 0 }), m_webBrowser(NULL), m_windowTitle(L""), m_initComplete(FALSE),
-	 m_docHostUiHandler(NULL)
+	:m_hInstance(nullptr), m_hWnd(nullptr), m_lastUrl(L""), m_msg({ 0 }), m_wc({ 0 }), m_webBrowser(nullptr), m_windowTitle(L""), m_initComplete(FALSE),
+	 m_docHostUiHandler(nullptr), m_sink(nullptr)
 {
-	if (platform == NULL)
+	
+	if (platform == nullptr)
 	{
 		//Log
+		throw; //Throw exception in This case
 	}
 
 	m_platform = platform;
@@ -54,6 +59,7 @@ BOOL AdBrowserFrame::OpenBrowser(HWND parent, BOOL modal, const wchar_t* urlStr)
 	Dialog dtp = { {DS_MODALFRAME | DS_3DLOOK | DS_SETFONT | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_VISIBLE, 0, 0/*Zero Sub Elements*/, 0, 0, 478, 296},
 		0, 0, L"Preview", 8, L"MS Sans Serif"};
 
+	g_frame = this;
 	DialogBoxIndirect(m_hInstance, (DLGTEMPLATE*)& dtp, parent, FrameProc);
 
 	::SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);	
@@ -61,16 +67,63 @@ BOOL AdBrowserFrame::OpenBrowser(HWND parent, BOOL modal, const wchar_t* urlStr)
   return TRUE;
 }
 
+HWND AdBrowserFrame::GetHwnd()
+{
+	return m_hWnd;
+}
+
+AdClientSite* AdBrowserFrame::GetClientSite()
+{
+	return m_clientSite;
+}
+
+AdInPlaceFrame* AdBrowserFrame::GetInPlaceFrame()
+{
+	return m_inPlaceFrame;
+}
+
+AdDocHostUiHandler* AdBrowserFrame::GetDocHostUiHandler()
+{
+	return m_docHostUiHandler;
+}
+
+IWebBrowser2* AdBrowserFrame::GetWebBrowser()
+{
+	return m_webBrowser;
+}
+
+AdInPlaceSite* AdBrowserFrame::GetInPlaceSite()
+{
+	return m_inPlaceSite;
+}
+
+IOleObject* AdBrowserFrame::GetWebBrowserAsOle() 
+{
+	return m_webBrowserOle;
+}
+
+AdBrowserEventSink* AdBrowserFrame::GetSink()
+{
+	return m_sink;
+}
+
 LRESULT CALLBACK AdBrowserFrame::FrameProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
 	case WM_DPICHANGED:
+	{
 		RECT rect;
-		DpiReCalculateBounds(hWnd, &rect);		
+		DpiReCalculateBounds(hWnd, &rect);
 		SetWindowPos(hWnd, /*HWND_TOPMOST*/0, rect.left, rect.top, rect.right, rect.bottom, SWP_SHOWWINDOW);
-		break;	
+		break;
+	}
+	case WM_INITDIALOG:
+	{
+		g_frame->InplaceBrowserIe();
 
+		return TRUE;
+	}
 	}
 	
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -137,9 +190,36 @@ STDMETHODIMP AdBrowserFrame::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid,
 }
 
 pError_t AdBrowserFrame::InplaceBrowserIe()
-{
-	IWebBrowser2* webBrowser2;
+{	
 	RECT             rect;
+
+	m_inPlaceFrame = new AdInPlaceFrame(this);
+	m_clientSite = new AdClientSite(this);
+	m_docHostUiHandler = new AdDocHostUiHandler(this);
+	m_inPlaceSite = new AdInPlaceSite(this);
+	
+	if (SUCCEEDED(::OleCreate(CLSID_WebBrowser, IID_IOleObject, 0x01, NULL, m_clientSite, NULL, (void**)& m_webBrowserOle)))
+	{
+		m_webBrowserOle->SetHostNames(L"Host Name", NULL);
+		GetClientRect(m_hWnd, &rect);
+
+		if (SUCCEEDED(OleSetContainedObject(static_cast<IUnknown*>(m_webBrowserOle), TRUE)))
+		{
+			if (SUCCEEDED(m_webBrowserOle->DoVerb(OLEIVERB_SHOW, NULL, m_clientSite, -1, m_hWnd, &rect)))
+			{
+				if (SUCCEEDED(m_webBrowserOle->QueryInterface(IID_IWebBrowser2, reinterpret_cast<void**>(&m_webBrowser))))
+				{
+					m_webBrowser->put_Left(0);
+					m_webBrowser->put_Top(0);
+					m_webBrowser->put_Width(rect.right);
+					m_webBrowser->put_Height(rect.bottom);
+
+					m_webBrowser->Release();
+				}
+			}
+		}
+	}
+
 
 	return P_ERROR_BROWSER_INIT;
 }

@@ -148,8 +148,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BrowserFrame.cpp" />
+    <ClCompile Include="ClientSite.cpp" />
+    <ClCompile Include="DocHostUiHandler.cpp" />
     <ClCompile Include="EventSink.cpp" />
     <ClCompile Include="Init.cpp" />
+    <ClCompile Include="InPlaceFrame.cpp" />
+    <ClCompile Include="InPlaceSite.cpp" />
     <ClCompile Include="Strings.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
