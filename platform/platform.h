@@ -40,6 +40,7 @@
 #define P_ERROR_PLATFORM_UNINIT P_ERROR(0x02)
 #define P_ERROR_LIBLOAD P_ERROR(0x03)
 #define P_ERROR_BROWSER P_ERROR(0x04)
+#define P_ERROR_BROWSER_LOAD P_ERROR(0x0400)
 #define P_ERROR_BROWSER_INIT P_ERROR(0x0401)
 #define P_ERROR_BROWSER_NAVIGATE P_ERROR(0x0402)
 #define P_ERROR_BROWSER_DISPLAY P_ERROR(0x0403)
@@ -174,7 +175,7 @@ extern "C" {
 		struct RestApiHelper restApi;
 		struct Strings strings;
 
-		pError_t(*Unload)(struct platform_t* platform);
+		pError_t(*Unload)(struct _platform_t* platform);
 		void* _internal;
 	} Platform_t;
 	//LoadPlatform

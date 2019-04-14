@@ -15,6 +15,7 @@
 #define IDC_BUTTON6                     1009
 #define IDC_BUTTON7                     1010
 #define IDC_BUTTON8                     1011
+#define IDC_BTNWEBBROWSER               1012
 #define IDC_EDIT5                       1014
 #define IDC_EDIT6                       1015
 #define IDC_EDIT7                       1016

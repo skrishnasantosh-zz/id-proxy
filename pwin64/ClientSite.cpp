@@ -5,7 +5,6 @@ AdClientSite::AdClientSite(AdBrowser* browser) : AdBrowserBase(browser)
 
 }
 
-
 HRESULT STDMETHODCALLTYPE AdClientSite::SaveObject()
 {
 	return E_NOTIMPL;

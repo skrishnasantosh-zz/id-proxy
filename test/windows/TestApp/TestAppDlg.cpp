@@ -8,6 +8,8 @@
 #include "TestAppDlg.h"
 #include "afxdialogex.h"
 
+#include "../../../platform/platform.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -31,6 +33,7 @@ void CTestAppDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTestAppDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BTNWEBBROWSER, &CTestAppDlg::OnBnClickedBtnwebbrowser)
 END_MESSAGE_MAP()
 
 
@@ -86,3 +89,18 @@ HCURSOR CTestAppDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+void CTestAppDlg::OnBnClickedBtnwebbrowser()
+{
+
+	Platform_t platform;
+
+	LoadPlatform(&platform, GetModuleHandle(NULL));
+
+	platform.browserFrame.events.onAfterPageLoad = NULL;
+	platform.browserFrame.events.onError = NULL;
+
+	platform.browserFrame.ShowBrowserFrame(&platform, GetModuleHandle(NULL), m_hWnd, TEXT("https://accounts-dev.autodesk.com"));
+
+	platform.Unload(&platform);
+}

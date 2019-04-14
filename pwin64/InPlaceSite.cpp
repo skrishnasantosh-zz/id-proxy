@@ -10,7 +10,7 @@ HRESULT STDMETHODCALLTYPE AdInPlaceSite::GetWindow(HWND FAR* lphwnd)
 	if (lphwnd == nullptr)
 		return E_POINTER;
 
-	*lphwnd = m_browser->m_hWnd;
+	*lphwnd = m_browser->GetWindowHandle();
 
 	return S_OK;
 }
@@ -50,7 +50,7 @@ HRESULT STDMETHODCALLTYPE AdInPlaceSite::GetWindowContext(LPOLEINPLACEFRAME FAR*
 	if (lpFrameInfo != nullptr)
 	{
 		lpFrameInfo->fMDIApp = FALSE;
-		lpFrameInfo->hwndFrame = m_browser->m_hWnd;
+		lpFrameInfo->hwndFrame = m_browser->GetWindowHandle();
 		lpFrameInfo->haccel = 0;
 		lpFrameInfo->cAccelEntries = 0;
 

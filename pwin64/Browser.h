@@ -126,7 +126,7 @@ public://COM
 
 class AdBrowser
 {
-public:
+private:
 	HWND m_hWnd;
 	IOleObject* m_webBrowserOle;
 

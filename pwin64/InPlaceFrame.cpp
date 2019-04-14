@@ -11,7 +11,7 @@ HRESULT STDMETHODCALLTYPE AdInPlaceFrame::GetWindow(HWND* lphwnd)
 	if (lphwnd == nullptr)
 		return E_POINTER;
 
-	*lphwnd = m_browser->m_hWnd;
+	*lphwnd = m_browser->GetWindowHandle();
 
 	return S_OK;
 }

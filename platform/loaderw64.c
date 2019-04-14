@@ -34,7 +34,7 @@ pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	const TCHAR *winDll = TEXT("C:\\Source\\id-proxy\\bin\\Debug\\pwin64.dll");
 
 	if (platform == NULL)
-		return;
+		return P_ERROR_BROWSER_LOAD;
 
 	memset(platform, 0, sizeof(Platform_t));
 

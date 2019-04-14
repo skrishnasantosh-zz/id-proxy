@@ -4,11 +4,14 @@
 AdBrowser::AdBrowser(HINSTANCE hInstance, const wchar_t* title) : 
 	m_hInstance(hInstance), m_title(title),
 	m_storage(this), m_inPlaceFrame(this), m_inPlaceSite(this), m_clientSite(this), m_webBrowserOle(nullptr)
+{ }
+
+AdBrowser::~AdBrowser(){ }
+
+HWND AdBrowser::GetWindowHandle()
 {
-
+	return m_hWnd;
 }
-
-AdBrowser::~AdBrowser(){}
 
 LRESULT CALLBACK AdBrowser::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -42,8 +45,7 @@ LRESULT CALLBACK AdBrowser::WindowProcThis(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		this->m_hWnd = hWnd;
 		InitWebBrowser();
 		break;
-
-	case WM_CLOSE:
+			
 	case WM_DESTROY:
 		UninitWebBrowser();
 		PostQuitMessage(0);
@@ -95,10 +97,14 @@ void AdBrowser::InitWebBrowser()
 
 void AdBrowser::UninitWebBrowser()
 {
+
 	if (m_webBrowserOle != nullptr)
 	{
-		m_webBrowserOle->Close(OLECLOSE_NOSAVE);
-		m_webBrowserOle->Release();
+		if (!IsBadReadPtr(m_webBrowserOle, sizeof(IOleObject*)))
+		{
+			m_webBrowserOle->Close(OLECLOSE_NOSAVE);
+			m_webBrowserOle->Release();
+		}
 	}
 }
 
@@ -132,6 +138,9 @@ void AdBrowser::Navigate(const wchar_t* urlStr)
 			MessageBox(m_hWnd, TEXT("Error"), TEXT("Unable to navigate WebBrowser. Navigate Failed"), MB_ICONERROR | MB_OK);
 		}
 
+		SysFreeString(url.bstrVal);
+		url.bstrVal = NULL;
+
 		VariantClear(&url);
 				
 		browser->Release();
@@ -161,8 +170,8 @@ void AdBrowser::ShowWindow(HWND parent, BOOL modal, const wchar_t* urlStr)
 		{
 			msg.hwnd = m_hWnd;
 
-			if (modal && (parent != NULL && parent != INVALID_HANDLE_VALUE && parent != HWND_DESKTOP))
-				EnableWindow(parent, TRUE);
+			if (modal && (parent != NULL && parent != INVALID_HANDLE_VALUE && parent != HWND_DESKTOP))			
+				EnableWindow(parent, FALSE);
 
 			::ShowWindow(m_hWnd, SW_SHOWDEFAULT);
 			UpdateWindow(m_hWnd);
@@ -176,7 +185,7 @@ void AdBrowser::ShowWindow(HWND parent, BOOL modal, const wchar_t* urlStr)
 			}
 
 			if (modal && (parent != NULL && parent != INVALID_HANDLE_VALUE && parent != HWND_DESKTOP))
-				EnableWindow(parent, TRUE);
+				EnableWindow(parent, TRUE);				
 		}	
 
 		OleUninitialize();

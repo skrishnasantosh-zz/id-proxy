@@ -12,6 +12,8 @@ pError_t ShowBrowserFrame(Platform_t* platform, void* appHandle, void* parentWin
 
 	delete frame;
 
+	UNREFERENCED_PARAMETER(platform);
+
 	return P_SUCCESS;
 }
 
