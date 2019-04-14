@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "idproxy", "idproxy.vcxproj", "{9E5AE360-07F8-4FDD-BEA2-BDAFDE81C2F7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32FCB62F-B3B6-40CE-8C27-49448675ED88} = {32FCB62F-B3B6-40CE-8C27-49448675ED88}
+		{3C0941D2-DA5F-46AC-8EE2-1F2171A08DED} = {3C0941D2-DA5F-46AC-8EE2-1F2171A08DED}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "updd", "..\updd\updd.vcxproj", "{7FDE684E-9A2B-4933-AE2F-7EC01297B4D8}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -19,12 +23,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Win32", "Win32", "{2DD06128-1D90-498A-83FA-13574C5D16ED}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestApp", "..\test\windows\TestApp\TestApp.vcxproj", "{A52DC619-4D29-47CA-92E8-02D12E9B2C37}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32FCB62F-B3B6-40CE-8C27-49448675ED88} = {32FCB62F-B3B6-40CE-8C27-49448675ED88}
+		{3C0941D2-DA5F-46AC-8EE2-1F2171A08DED} = {3C0941D2-DA5F-46AC-8EE2-1F2171A08DED}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BDBB3911-B2C4-4E36-84C1-30070154AE76}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{7E397187-58A2-41EA-852A-1AAD232F3E98}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pwin64", "..\pwin64\pwin64.vcxproj", "{3C0941D2-DA5F-46AC-8EE2-1F2171A08DED}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32FCB62F-B3B6-40CE-8C27-49448675ED88} = {32FCB62F-B3B6-40CE-8C27-49448675ED88}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -18,7 +18,7 @@
 
 typedef BOOL (*pInitializePlatform_t)(Platform_t* platform);
 
-void UnloadPlatform(Platform_t* platform);
+pError_t UnloadPlatform(Platform_t* platform);
 
 struct _internal
 {
@@ -61,7 +61,7 @@ pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	return P_ERROR(0);
 }
 
-void UnloadPlatform(Platform_t* platform)
+pError_t UnloadPlatform(Platform_t* platform)
 {
 	if (platform->browserFrame.Unload != NULL)	
 		platform->browserFrame.Unload(platform);	
@@ -74,6 +74,8 @@ void UnloadPlatform(Platform_t* platform)
 
 	if (platform->_internal != NULL)	
 		FreeLibrary((HMODULE)platform->_internal);	
+	
+	return P_SUCCESS;
 }
 
 #endif //PLATFORM_WINDOWS

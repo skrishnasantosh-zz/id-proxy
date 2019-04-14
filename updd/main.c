@@ -7,11 +7,10 @@
 
 int main(int argc, char** argv)
 {
+	UNREFERENCED_PARAMETER(argc);
+	UNREFERENCED_PARAMETER(argv);
+
 	SetProcessDPIAware();
-
-	pError_t error = P_ERROR(0);
-
-	int ok = (P_ERROR_OK(error));
 
 	wprintf(L"%s\n", __PLATFORM__);
 

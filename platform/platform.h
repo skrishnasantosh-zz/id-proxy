@@ -60,6 +60,7 @@ extern "C" {
 	typedef unsigned long long pLen_t;
 
 	typedef void (*pfnProgressNotifier_t)(int progressPercent);
+
 	typedef char* pUtf8_t;
 	
 #define UTF8(text) u8"text"
@@ -94,7 +95,7 @@ extern "C" {
 		UrlChanged,
 	};
 
-	typedef pError_t(*pfnBrowserEvent_t)(struct _platform_t* platform, struct WebBrowserFrame* frame, const pUtf8_t* url, const pUtf8_t* error, int *bShouldCancel);
+	typedef pError_t(*pfnBrowserEvent_t)(struct _platform_t* platform, struct WebBrowserFrame* frame, const pUtf8_t url, const pUtf8_t error, int *bShouldCancel);
 
 	struct WebBrowserEventHandler
 	{
@@ -106,7 +107,7 @@ extern "C" {
 
 	struct WebBrowserFrame
 	{
-		pError_t (*ShowBrowserFrame)(struct _platform_t* platform, void* appHandle, void* parentWindow, const wchar_t* u8UrlString);
+		pError_t (*ShowBrowserFrame)(struct _platform_t* platform, void* appHandle, void* parentWindow, const wchar_t* u8UrlString); //TODO: pUtf8_t
 		pError_t (*CloseBrowserFrame)(struct _platform_t* platform);		
 
 		struct WebBrowserEventHandler events;
@@ -128,13 +129,19 @@ extern "C" {
 		size_t(*CharToWideChar)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const char* str, const size_t strlen);
 		size_t(*WideCharToChar)(struct _platform_t* platform, char* dest, const size_t destSize, const wchar_t* str, const size_t strlen);
 
-		pError_t (*Unload)(struct platform_t* _platform_t);
+		pError_t (*Unload)(struct _platform_t* _platform_t);
 
 		void* _internal;
 	};
 
 	////REST API
 
+#define HTTP_GET 0
+#define HTTP_POST 1
+#define HTTP_PUT 2
+#define HTTP_DELETE 3
+#define HTTP_PATCH 4
+	
 	struct HttpHeader
 	{
 		wchar_t headerKey[P_REST_HEADER_KEYLEN];
@@ -162,9 +169,9 @@ extern "C" {
 		struct OAuth1 oAuth1;
 		struct OAuth2 oAuth2;
 						
-		pError_t(*Get)(const wchar_t* fullUrl, struct Headers* additionalHeaders, size_t headerCount);
-
-		pError_t(*Unload)(struct platform_t* platform);
+		pError_t(*SendRequest)(int httpRequestType, const wchar_t* url, struct HttpHeader* headers, size_t headerCount, void* body, size_t bodySize, void* response, size_t responseGivenSize, size_t *responseSize);
+		
+		pError_t(*Unload)(struct _platform_t* platform);
 		void* _internal;
 	};
 	

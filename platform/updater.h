@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-	extern struct _platform_t;
+	struct _platform_t;
 
 	struct AutoUpdateFileInf
 	{
