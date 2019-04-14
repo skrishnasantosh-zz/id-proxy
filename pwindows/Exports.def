@@ -1,3 +1,0 @@
-LIBRARY Platform
-EXPORTS	
-	InitializePlatform @1	

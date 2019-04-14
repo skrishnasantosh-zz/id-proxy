@@ -29,12 +29,12 @@
 #define P_REST_QPARAM_STRLEN 48
 #define P_REST_QVALUE_STRLEN 1024
 
+#define P_SUCCESS P_ERROR(0x00)
+
 
 #define P_ERROR(errC) (errC)
-#define P_ERROR_OK(x) (x == 0)
+#define P_ERROR_OK(x) (x == P_SUCCESS)
 #define P_ERROR_FAIL (!P_ERROR_OK)
-
-#define P_SUCCESS P_ERROR(0x00)
 
 #define P_ERROR_PLATFORM_INIT P_ERROR(0x01)
 #define P_ERROR_PLATFORM_UNINIT P_ERROR(0x02)
@@ -105,7 +105,7 @@ extern "C" {
 
 	struct WebBrowserFrame
 	{
-		pError_t (*ShowBrowserFrame)(struct _platform_t* platform, void* appHandle, void* parentWindow, pUtf8_t u8UrlString);
+		pError_t (*ShowBrowserFrame)(struct _platform_t* platform, void* appHandle, void* parentWindow, const wchar_t* u8UrlString);
 		pError_t (*CloseBrowserFrame)(struct _platform_t* platform);		
 
 		struct WebBrowserEventHandler events;

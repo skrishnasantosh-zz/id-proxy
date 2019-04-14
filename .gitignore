@@ -6,9 +6,9 @@ platform/platform.vcxproj.user
 platform/platform.vcxproj.filters
 platform/x64/Debug/loaderw64.obj
 platform/x64/
-pwindows/pwindows.vcxproj.user
-pwindows/pwindows.vcxproj.filters
-pwindows/x64/
+pwin64/pwin64.vcxproj.user
+pwin64/pwin64.vcxproj.filters
+pwin64/x64/
 test/windows/TestApp/TestApp.vcxproj.filters
 test/windows/TestApp/TestApp.vcxproj.user
 test/windows/TestApp/x64/

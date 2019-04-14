@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 	platform.browserFrame.events.onAfterPageLoad = NULL;
 	platform.browserFrame.events.onError = NULL;
 
-	platform.browserFrame.ShowBrowserFrame(&platform, GetModuleHandle(NULL), NULL, NULL);
+	platform.browserFrame.ShowBrowserFrame(&platform, GetModuleHandle(NULL), NULL, TEXT("https://accounts-dev.autodesk.com"));
 
 	platform.Unload(&platform);
 

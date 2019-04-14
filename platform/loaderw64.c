@@ -31,7 +31,7 @@ pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	TCHAR filePath[FILE_STRLEN] = { 0 };
 	HRESULT result = S_FALSE;
 	DWORD bytesWritten;
-	const TCHAR *winDll = TEXT("C:\\Source\\id-proxy\\bin\\Debug\\pwindows.dll");
+	const TCHAR *winDll = TEXT("C:\\Source\\id-proxy\\bin\\Debug\\pwin64.dll");
 
 	if (platform == NULL)
 		return;
