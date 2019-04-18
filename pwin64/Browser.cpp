@@ -2,11 +2,13 @@
 #include "Browser.h"
 
 AdBrowser::AdBrowser(HINSTANCE hInstance, const wchar_t* title) : 
-	m_hInstance(hInstance), m_title(title),
-	m_storage(this), m_inPlaceFrame(this), m_inPlaceSite(this), m_clientSite(this), m_webBrowserOle(nullptr)
+	m_hInstance(hInstance), m_title(title), m_hWnd(nullptr),
+	m_storage(this), m_inPlaceFrame(this), m_inPlaceSite(this), 
+	m_clientSite(this), m_webBrowserOle(nullptr)
 { }
 
-AdBrowser::~AdBrowser(){ }
+AdBrowser::~AdBrowser()
+{ }
 
 HWND AdBrowser::GetWindowHandle()
 {
@@ -166,7 +168,7 @@ void AdBrowser::ShowWindow(HWND parent, BOOL modal, const wchar_t* urlStr)
 		m_hWnd = CreateWindowEx(0, &className[0], BROWSER_FRAME_TITLE, WS_SYSMENU | WS_CAPTION | WS_DLGFRAME,
 			CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, HWND_DESKTOP, NULL, m_hInstance, this);
 
-		if (m_hWnd != NULL || m_hWnd != INVALID_HANDLE_VALUE)
+		if (m_hWnd != NULL && m_hWnd != INVALID_HANDLE_VALUE)
 		{
 			msg.hwnd = m_hWnd;
 

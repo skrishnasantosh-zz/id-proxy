@@ -30,7 +30,7 @@
 #define P_REST_QVALUE_STRLEN 1024
 
 #define P_SUCCESS P_ERROR(0x00)
-
+#define P_NO_IMPL (0xffffffff)
 
 #define P_ERROR(errC) (errC)
 #define P_ERROR_OK(x) (x == P_SUCCESS)
@@ -47,6 +47,15 @@
 #define P_ERROR_BROWSER_CLEANUP P_ERROR(0x9999) /* All cleanups have this error code */
 #define P_ERROR_WINDOW P_ERROR(0x05)
 
+#define P_ERROR_STRING P_ERROR(0x06)
+#define P_ERROR_STRING_DESTTOOSMALL (0x0601)
+
+#define P_ERROR_POINTER (0x701)
+
+#define P_ERROR_OPS (0x901)
+
+#define P_ERROR_INVALID_ARG (0x801)
+
 #define P_FALSE (0)
 #define P_TRUE (!P_FALSE)
 
@@ -58,6 +67,7 @@ extern "C" {
 
 	typedef int pBool_t;
 	typedef unsigned long long pLen_t;
+	typedef char pByte_t;
 
 	typedef void (*pfnProgressNotifier_t)(int progressPercent);
 
@@ -79,6 +89,13 @@ extern "C" {
 		AppleOSX64,
 		RHEL64
 	};	
+
+	enum LogLevel
+	{
+		LOG_INFO,
+		LOG_WARN,
+		LOG_ERROR
+	};
 
 	struct AutoUpdate;
 	struct _platform_t;
@@ -116,19 +133,54 @@ extern "C" {
 		void* _internal;
 	};
 
+	////Url
+	struct Url
+	{
+		pError_t(*UrlEncode)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char16_t* url);
+		pError_t(*UrlDecode)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char16_t* url);
+	};
+
+	////Crypto
+	struct Crypto
+	{
+		pError_t(*HmacSha1)(struct _platform_t* platform, pByte_t* dest, const size_t destSize, const pByte_t* str, const size_t strLen, const pByte_t* secret, const size_t secretLen);
+	};
+
+
+	////Logger
+	struct Logger
+	{
+		pError_t(*Log)(struct _platform_t* platform, enum LogLevel logLevel, const char16_t* logString);
+		pError_t(*LogW)(struct _platform_t* platform, enum LogLevel logLevel, const wchar_t* logString, ...);
+	};
+
 	////Strings
 	struct Strings
 	{
-		size_t(*Utf8toUtf16)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char* str, const size_t strlen);
-		size_t(*Utf8toUtf32)(struct _platform_t* platform, char32_t* dest, const size_t destSize, const char* str, const size_t strlen);
-		size_t(*Utf16toUtf8)(struct _platform_t* platform, char* dest, const size_t destSize, const char16_t* str, const size_t strlen);
-		size_t(*Utf16toUtf32)(struct _platform_t* platform, char32_t* dest, const size_t destSize, const char16_t* str, const size_t strlen);
-		size_t(*Utf32toUtf16)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char32_t* str, const size_t strlen);
-		size_t(*Utf32toUtf8)(struct _platform_t* platform, char* dest, const size_t destSize, const char32_t* str, const size_t strlen);
-		
-		size_t(*CharToWideChar)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const char* str, const size_t strlen);
-		size_t(*WideCharToChar)(struct _platform_t* platform, char* dest, const size_t destSize, const wchar_t* str, const size_t strlen);
+		pError_t(*Utf8ToUtf16)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const pUtf8_t str, const size_t strlen);
+		pError_t(*Utf8ToUtf32)(struct _platform_t* platform, char32_t* dest, const size_t destSize, const pUtf8_t str, const size_t strlen);
+		pError_t(*Utf16ToUtf8)(struct _platform_t* platform, pUtf8_t dest, const size_t destSize, const char16_t* str, const size_t strlen);
+		pError_t(*Utf16ToUtf32)(struct _platform_t* platform, char32_t* dest, const size_t destSize, const char16_t* str, const size_t strlen);
+		pError_t(*Utf32ToUtf16)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char32_t* str, const size_t strlen);
+		pError_t(*Utf32ToUtf8)(struct _platform_t* platform, pUtf8_t dest, const size_t destSize, const char32_t* str, const size_t strlen);
+				
+		pError_t(*Utf8ToWChar)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const pUtf8_t str, const size_t strlen);
+		pError_t(*WCharToUtf8)(struct _platform_t* platform, pUtf8_t dest, const size_t destSize, const wchar_t* str, const size_t strlen);
+		pError_t(*Utf16ToWChar)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const char16_t str, const size_t strlen);
+		pError_t(*WCharToUtf16)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const wchar_t* str, const size_t strlen);
+		pError_t(*Utf32ToWChar)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const char32_t *str, const size_t strlen);
+		pError_t(*WCharToUtf32)(struct _platform_t* platform, char32_t* dest, const size_t destSize, const wchar_t* str, const size_t strlen);
 
+		
+		pError_t(*CharToUtf16)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const char* str, const size_t strlen);
+		
+		
+		//Statics
+		size_t(*StrlenU8)(struct _platform_t* platform, const pUtf8_t str);
+		size_t(*StrlenU16)(struct _platform_t* platform, const char16_t* str);
+		size_t(*StrlenU32)(struct _platform_t* platform, const char32_t* str);
+
+		//Unload
 		pError_t (*Unload)(struct _platform_t* _platform_t);
 
 		void* _internal;
@@ -181,6 +233,8 @@ extern "C" {
 		struct WebBrowserFrame browserFrame;		
 		struct RestApiHelper restApi;
 		struct Strings strings;
+		struct Url url;
+		struct Logger logger;
 
 		pError_t(*Unload)(struct _platform_t* platform);
 		void* _internal;
@@ -188,7 +242,7 @@ extern "C" {
 	//LoadPlatform
 
 	extern pError_t LoadPlatform(Platform_t* platform, void *appInstanceHandle);
-	
+	   	
 #ifdef __cplusplus
 }
 #endif

@@ -86,13 +86,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;PLATFORM_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -170,9 +170,12 @@
   <ItemGroup>
     <ClInclude Include="updater.h" />
     <ClInclude Include="platform.h" />
+    <ClInclude Include="UrlBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="loaderw64.c" />
+    <ClCompile Include="UrlBuilder.cpp" />
+    <ClCompile Include="strings.cpp" />
     <ClCompile Include="updater.c" />
   </ItemGroup>
   <ItemGroup>

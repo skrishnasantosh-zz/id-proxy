@@ -1,6 +1,8 @@
 #include "../platform/platform.h"
 #include "Browser.h"
 
+pError_t HmacSha1(Platform_t* platform, pByte_t* dest, const size_t destSize, const char16_t* str, const char16_t* secret);
+
 pError_t ShowBrowserFrame(Platform_t* platform, void* appHandle, void* parentWindow, const wchar_t* url)
 {
 
@@ -14,6 +16,19 @@ pError_t ShowBrowserFrame(Platform_t* platform, void* appHandle, void* parentWin
 
 	UNREFERENCED_PARAMETER(platform);
 
+	return P_SUCCESS;
+}
+
+pError_t UrlEncode(Platform_t* platform, char16_t* dest, const size_t destSize, const char16_t* url)
+{
+	
+
+
+	return P_SUCCESS;
+}
+
+pError_t UrlDecode(Platform_t* platform, char16_t* dest, const size_t destSize, const char16_t* url)
+{
 	return P_SUCCESS;
 }
 

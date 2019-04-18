@@ -21,9 +21,14 @@ int main(int argc, char** argv)
 	platform.browserFrame.events.onAfterPageLoad = NULL;
 	platform.browserFrame.events.onError = NULL;
 
-	platform.browserFrame.ShowBrowserFrame(&platform, GetModuleHandle(NULL), NULL, TEXT("https://accounts-dev.autodesk.com"));
+	char16_t test[20] = { 0 };
+	const char* u8str = u8"Test U8";
+
+	printf("\n Error : 0x%0x\n", platform.strings.Utf8ToWChar(&platform, test, 12, u8"Trail", 5));
 
 	platform.Unload(&platform);
+	
+	wprintf(L"String is : %s\n", test);
 
 	return 0;
 }

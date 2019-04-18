@@ -138,6 +138,7 @@
     <ClCompile Include="BrowserBase.cpp" />
     <ClCompile Include="Browser.cpp" />
     <ClCompile Include="ClientSite.cpp" />
+    <ClCompile Include="HmacSha1.cpp" />
     <ClCompile Include="InPlaceFrame.cpp" />
     <ClCompile Include="InPlaceSite.cpp" />
     <ClCompile Include="PlatformInit.cpp" />
@@ -145,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Browser.h" />
+    <ClInclude Include="PlatformExports.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pwin64.def" />

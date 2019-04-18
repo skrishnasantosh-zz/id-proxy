@@ -16,6 +16,9 @@
 
 #define FILE_STRLEN 1024
 
+extern pError_t Utf8ToUtf16(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char* str, const size_t strlen);
+extern pError_t Utf8ToWChar(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const pUtf8_t str, const size_t strlen);
+
 typedef BOOL (*pInitializePlatform_t)(Platform_t* platform);
 
 pError_t UnloadPlatform(Platform_t* platform);
@@ -24,6 +27,12 @@ struct _internal
 {
 	HMODULE library;
 };
+
+void InitDefaults(Platform_t* platform)
+{
+	platform->strings.Utf8ToUtf16 = Utf8ToUtf16;
+	platform->strings.Utf8ToWChar = Utf8ToWChar;
+}
 
 pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 {
@@ -41,6 +50,8 @@ pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	platform->_internal = calloc(1, sizeof(struct _internal));
 	if (platform->_internal == NULL)
 		return P_ERROR(P_ERR_INSUFFICIENT_MEMORY);
+
+	InitDefaults(platform);
 		
 	GetModuleFileName(hInstance, filePath, FILE_STRLEN);
 
@@ -57,6 +68,7 @@ pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	}
 
 	platform->Unload = UnloadPlatform;
+
 
 	return P_ERROR(0);
 }
