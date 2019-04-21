@@ -48,6 +48,7 @@ pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	memset(platform, 0, sizeof(Platform_t));
 
 	platform->_internal = calloc(1, sizeof(struct _internal));
+
 	if (platform->_internal == NULL)
 		return P_ERROR(P_ERR_INSUFFICIENT_MEMORY);
 
@@ -78,8 +79,8 @@ pError_t UnloadPlatform(Platform_t* platform)
 	if (platform->browserFrame.Unload != NULL)	
 		platform->browserFrame.Unload(platform);	
 
-	if (platform->restApi.Unload != NULL)
-		platform->restApi.Unload(platform);
+	if (platform->webRequest.Unload != NULL)
+		platform->webRequest.Unload(platform);
 
 	if (platform->strings.Unload != NULL)
 		platform->strings.Unload(platform);

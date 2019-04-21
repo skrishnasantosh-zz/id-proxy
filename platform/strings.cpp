@@ -10,7 +10,7 @@
 extern "C" pError_t Utf8ToUtf16(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char* str, const size_t strlen)
 {
 	if ((strlen >= destSize) || (destSize <= (strlen * sizeof(char16_t)) + sizeof(char16_t)))
-		return P_ERROR_STRING_DESTTOOSMALL;
+		return P_ERROR_DESTTOOSMALL;
 	
 	std::wstring_convert<std::codecvt<int16_t, char, std::mbstate_t>, int16_t> convert;
 	std::u16string u16 = reinterpret_cast<const char16_t*>(convert.from_bytes(str).c_str());	
@@ -24,7 +24,7 @@ extern "C" pError_t Utf8ToUtf16(struct _platform_t* platform, char16_t* dest, co
 pError_t Utf8toUtf32(struct _platform_t* platform, char32_t* dest, const size_t destSize, const char* str, const size_t strlen)
 {
 	if ((strlen >= destSize) || (destSize <= (strlen * sizeof(char32_t)) + sizeof(char32_t)))
-		return P_ERROR_STRING_DESTTOOSMALL;
+		return P_ERROR_DESTTOOSMALL;
 
 	std::wstring_convert<std::codecvt<int32_t, char, std::mbstate_t>, int32_t> convert;
 	std::u32string u32 = reinterpret_cast<const char32_t*>(convert.from_bytes(str).c_str());
@@ -58,7 +58,7 @@ pError_t Utf32toUtf8(struct _platform_t* platform, char* dest, const size_t dest
 extern "C" pError_t Utf8ToWChar(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const pUtf8_t str, const size_t strlen)
 {
 	if ((strlen >= destSize) || (destSize < (strlen * sizeof(wchar_t)) + sizeof(wchar_t)))
-		return P_ERROR_STRING_DESTTOOSMALL;
+		return P_ERROR_DESTTOOSMALL;
 
 	std::wstring_convert<std::codecvt<wchar_t, char, std::mbstate_t>, wchar_t> convert;
 	std::wstring ustr = convert.from_bytes(str).c_str();
@@ -118,7 +118,7 @@ size_t StrlenU32(struct _platform_t* platform, const char32_t* str)
 pError_t CharToUtf16(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char* str, const size_t strlen)
 {
 	if (destSize <= (strlen * sizeof(char16_t)) + sizeof(char16_t))
-		return P_ERROR_STRING_DESTTOOSMALL;
+		return P_ERROR_DESTTOOSMALL;
 	
 	memset(dest, 0, destSize);
 

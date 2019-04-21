@@ -24,8 +24,9 @@ UrlBuilder::~UrlBuilder()
 
 void UrlBuilder::AddParam(const u16string key, const u16string value, bool escape)
 {
+	(escape);
 	//TODO: escape
-	m_params.insert(std::pair<u16string, u16string>(key, value));
+	m_params.insert(pair<u16string, u16string>(key, value));
 }
 	
 bool UrlBuilder::Build(u16string& url)
@@ -42,12 +43,11 @@ bool UrlBuilder::Build(u16string& url)
 
 		pos++;
 
-		if (pos == len)		
+		if (pos == len)
 			break;
-		
+
 		url.append(u"&");
 	}
-
 
 	return true;
 }

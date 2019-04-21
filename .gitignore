@@ -16,3 +16,6 @@ updd/updd.vcxproj.user
 updd/updd.vcxproj.filters
 updd/x64/
 bin/
+idproxy-tests/idproxy-tests/.vs/
+idproxy-tests/idproxy-tests/idproxy-tests.vcxproj.user
+idproxy-tests/idproxy-tests/idproxy-tests.vcxproj.filters

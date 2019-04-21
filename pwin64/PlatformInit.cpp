@@ -1,7 +1,23 @@
 #include "../platform/platform.h"
 #include "Browser.h"
+#include <varargs.h>
 
-pError_t HmacSha1(Platform_t* platform, pByte_t* dest, const size_t destSize, const char16_t* str, const char16_t* secret);
+extern "C" pError_t HmacSha1(Platform_t* platform, pByte_t* dest, const size_t destSize, size_t* calculatedSize, const pByte_t* str, const size_t strLen, const pByte_t* secret, const size_t secretLen);
+pError_t LogW(struct _platform_t* platform, enum LogLevel logLevel, const wchar_t* logString, ...)
+{
+	wchar_t szLogText[10 * 1024] = { 0 };
+
+	va_list args;
+	va_start(args, logString);
+
+	vswprintf_s(szLogText, 10 * 1024, logString, args);
+
+	wprintf(L"\n%s", szLogText);
+
+	va_end(args);
+
+	return P_SUCCESS;
+}
 
 pError_t ShowBrowserFrame(Platform_t* platform, void* appHandle, void* parentWindow, const wchar_t* url)
 {
@@ -38,6 +54,8 @@ pError_t InitializePlatform(Platform_t* platform)
 		return P_ERROR_PLATFORM_INIT;
 
 	platform->browserFrame.ShowBrowserFrame = ShowBrowserFrame;
+	platform->crypto.HmacSha1 = HmacSha1;
+	platform->logger.LogW = LogW;
 	
 	return P_SUCCESS;
 }

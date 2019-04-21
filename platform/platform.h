@@ -24,7 +24,7 @@
 #define P_HASH_MAX_STRLEN 64
 
 #define P_REST_HEADER_KEYLEN 48
-#define P_REST_HEADER_VALUELEN 256
+#define P_REST_HEADER_VALUELEN 2048
 
 #define P_REST_QPARAM_STRLEN 48
 #define P_REST_QVALUE_STRLEN 1024
@@ -33,28 +33,36 @@
 #define P_NO_IMPL (0xffffffff)
 
 #define P_ERROR(errC) (errC)
-#define P_ERROR_OK(x) (x == P_SUCCESS)
+#define P_OK(x) (x == P_SUCCESS)
 #define P_ERROR_FAIL (!P_ERROR_OK)
 
-#define P_ERROR_PLATFORM_INIT P_ERROR(0x01)
-#define P_ERROR_PLATFORM_UNINIT P_ERROR(0x02)
-#define P_ERROR_LIBLOAD P_ERROR(0x03)
-#define P_ERROR_BROWSER P_ERROR(0x04)
-#define P_ERROR_BROWSER_LOAD P_ERROR(0x0400)
-#define P_ERROR_BROWSER_INIT P_ERROR(0x0401)
-#define P_ERROR_BROWSER_NAVIGATE P_ERROR(0x0402)
-#define P_ERROR_BROWSER_DISPLAY P_ERROR(0x0403)
-#define P_ERROR_BROWSER_CLEANUP P_ERROR(0x9999) /* All cleanups have this error code */
+#define P_ERROR_PLATFORM_INIT P_ERROR(-0x01)
+#define P_ERROR_INVALIDLENGTH P_ERROR(-0x0102)
+#define P_ERROR_DESTTOOSMALL (-0x0103)
+#define P_ERROR_PLATFORM_UNINIT P_ERROR(-0x0104)
+#define P_ERROR_SYSTEM P_ERROR(-0x0105)
+
+#define P_ERROR_LIBLOAD P_ERROR(-0x03)
+#define P_ERROR_BROWSER P_ERROR(-0x04)
+#define P_ERROR_BROWSER_LOAD P_ERROR(-0x0400)
+#define P_ERROR_BROWSER_INIT P_ERROR(-0x0401)
+#define P_ERROR_BROWSER_NAVIGATE P_ERROR(-0x0402)
+#define P_ERROR_BROWSER_DISPLAY P_ERROR(-0x0403)
+#define P_ERROR_BROWSER_CLEANUP P_ERROR(-0x9999) /* All cleanups have this error code */
 #define P_ERROR_WINDOW P_ERROR(0x05)
 
-#define P_ERROR_STRING P_ERROR(0x06)
-#define P_ERROR_STRING_DESTTOOSMALL (0x0601)
+#define P_ERROR_OUTOFMEMORY (-0x0101)
 
-#define P_ERROR_POINTER (0x701)
+#define P_ERROR_STRING P_ERROR(-0x06)
 
-#define P_ERROR_OPS (0x901)
+#define P_ERROR_POINTER (-0x701)
 
-#define P_ERROR_INVALID_ARG (0x801)
+#define P_ERROR_OPS (-0x09)
+#define P_ERROR_CRYPT (-0x902)
+
+#define P_ERROR_INVALID_ARG (-0x801)
+
+#define P_WARN_MEMORYNOTCLEARED (0x10)
 
 #define P_FALSE (0)
 #define P_TRUE (!P_FALSE)
@@ -67,18 +75,19 @@ extern "C" {
 
 	typedef int pBool_t;
 	typedef unsigned long long pLen_t;
-	typedef char pByte_t;
-
-	typedef void (*pfnProgressNotifier_t)(int progressPercent);
-
-	typedef char* pUtf8_t;
-	
-#define UTF8(text) u8"text"
-
+	typedef unsigned char pByte_t;
 	typedef int pError_t;
 
 	struct _platform_t;
 
+
+	typedef void (*pfnProgressNotifier_t)(int progressPercent);
+	typedef void(*pfnWebRequestCallBack_t)(struct _platform_t* platform, void* response, size_t responseBufferSize, size_t* responseSize, pError_t* error);
+
+	typedef char* pUtf8_t;
+	
+#define UTF8(text) u8#text
+	
 	typedef struct {
 		int major, minor, revision, patch;
 	} ptVersion_t;
@@ -112,7 +121,7 @@ extern "C" {
 		UrlChanged,
 	};
 
-	typedef pError_t(*pfnBrowserEvent_t)(struct _platform_t* platform, struct WebBrowserFrame* frame, const pUtf8_t url, const pUtf8_t error, int *bShouldCancel);
+	typedef pError_t(*pfnBrowserEvent_t)(struct _platform_t* platform, struct WebBrowserFrame* frame, const wchar_t* url, const wchar_t* error, int *bShouldCancel);
 
 	struct WebBrowserEventHandler
 	{
@@ -143,7 +152,7 @@ extern "C" {
 	////Crypto
 	struct Crypto
 	{
-		pError_t(*HmacSha1)(struct _platform_t* platform, pByte_t* dest, const size_t destSize, const pByte_t* str, const size_t strLen, const pByte_t* secret, const size_t secretLen);
+		pError_t(*HmacSha1)(struct _platform_t* platform, pByte_t* dest, const size_t destSize, size_t* calculatedSize, const pByte_t* str, const size_t strLen, const pByte_t* secret, const size_t secretLen);
 	};
 
 
@@ -205,23 +214,11 @@ extern "C" {
 		wchar_t queryParam[P_REST_QPARAM_STRLEN];
 		wchar_t queryValue[P_REST_QVALUE_STRLEN];
 	};
-
-	struct OAuth1
-	{
-		pError_t(*Get)(const wchar_t* fullUrl, const wchar_t* consumerKey, const wchar_t* consumerSecret, const wchar_t *token, const wchar_t* tokenSecret, struct HttpHeader* additionalHeaders, size_t headerCount);
-	};
-
-	struct OAuth2
-	{
-		pError_t(*Get)(const wchar_t* fullUrl, const wchar_t* clientId, const wchar_t* clientSecret, const wchar_t* token, const wchar_t* tokenSecret, struct HttpHeader* additionalHeaders, size_t headerCount);
-	};
-
-	struct RestApiHelper
-	{
-		struct OAuth1 oAuth1;
-		struct OAuth2 oAuth2;
-						
-		pError_t(*SendRequest)(int httpRequestType, const wchar_t* url, struct HttpHeader* headers, size_t headerCount, void* body, size_t bodySize, void* response, size_t responseGivenSize, size_t *responseSize);
+		
+	struct WebRequest
+	{					
+		pError_t(*SendRequest)(struct _platform_t* platform, int httpRequestType, const wchar_t* url, struct HttpHeader* headers, size_t headerCount, void* body, size_t bodySize, void* response, size_t responseBufferSize, size_t *responseSize);
+		pError_t(*SendRequestAsync)(struct _platform_t* platform, int httpRequestType, const wchar_t* url, struct HttpHeader* headers, size_t headerCount, void* body, size_t bodySizem, pfnWebRequestCallBack_t callback);
 		
 		pError_t(*Unload)(struct _platform_t* platform);
 		void* _internal;
@@ -231,17 +228,18 @@ extern "C" {
 
 		//struct AutoUpdate autoUpdater;
 		struct WebBrowserFrame browserFrame;		
-		struct RestApiHelper restApi;
+		struct WebRequest webRequest;
 		struct Strings strings;
 		struct Url url;
 		struct Logger logger;
+		struct Crypto crypto;
 
 		pError_t(*Unload)(struct _platform_t* platform);
 		void* _internal;
 	} Platform_t;
 	//LoadPlatform
 
-	extern pError_t LoadPlatform(Platform_t* platform, void *appInstanceHandle);
+	pError_t LoadPlatform(Platform_t* platform, void *appInstanceHandle);
 	   	
 #ifdef __cplusplus
 }
