@@ -157,6 +157,7 @@ void AdBrowser::ShowWindow(HWND parent, BOOL modal, const wchar_t* urlStr)
 	if (OleInitialize(NULL) == S_OK)
 	{
 		WNDCLASSEX		wc;		
+		RECT rect;
 
 		ZeroMemory(&wc, sizeof(WNDCLASSEX));
 		wc.cbSize = sizeof(WNDCLASSEX);
@@ -165,8 +166,12 @@ void AdBrowser::ShowWindow(HWND parent, BOOL modal, const wchar_t* urlStr)
 		wc.lpszClassName = &className[0];
 		RegisterClassEx(&wc);
 
+		GetClientRect(GetDesktopWindow(), &rect);
+		rect.left = (rect.right / 2) - (1024 / 2);
+		rect.top = (rect.bottom / 2) - (512 / 2);
+		
 		m_hWnd = CreateWindowEx(0, &className[0], BROWSER_FRAME_TITLE, WS_SYSMENU | WS_CAPTION | WS_DLGFRAME,
-			CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, HWND_DESKTOP, NULL, m_hInstance, this);
+			rect.left, rect.top, 1024, 512, HWND_DESKTOP, NULL, m_hInstance, this);
 
 		if (m_hWnd != NULL && m_hWnd != INVALID_HANDLE_VALUE)
 		{

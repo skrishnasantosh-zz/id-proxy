@@ -19,6 +19,9 @@
 extern pError_t Utf8ToUtf16(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char* str, const size_t strlen);
 extern pError_t Utf8ToWChar(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const pUtf8_t str, const size_t strlen);
 
+extern pError_t Base64Encode(struct _platform_t* platform, pByte_t* dest, const size_t destSize, const pByte_t* str, const size_t strSize);
+extern pError_t UrlEncode(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const wchar_t* url, const size_t urlSize);
+
 typedef BOOL (*pInitializePlatform_t)(Platform_t* platform);
 
 pError_t UnloadPlatform(Platform_t* platform);
@@ -32,6 +35,9 @@ void InitDefaults(Platform_t* platform)
 {
 	platform->strings.Utf8ToUtf16 = Utf8ToUtf16;
 	platform->strings.Utf8ToWChar = Utf8ToWChar;
+
+	platform->httpHelpers.Base64Encode = Base64Encode;
+	platform->httpHelpers.UrlEncode = UrlEncode;
 }
 
 pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
@@ -40,7 +46,7 @@ pError_t LoadPlatform(Platform_t* platform, void* appInstanceHandle)
 	TCHAR filePath[FILE_STRLEN] = { 0 };
 	HRESULT result = S_FALSE;
 	DWORD bytesWritten;
-	const TCHAR *winDll = TEXT("C:\\Source\\id-proxy\\bin\\Debug\\pwin64.dll");
+	const TCHAR *winDll = TEXT("pwin64.dll");
 
 	if (platform == NULL)
 		return P_ERROR_BROWSER_LOAD;

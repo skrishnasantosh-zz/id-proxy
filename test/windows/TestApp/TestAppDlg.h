@@ -32,4 +32,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnwebbrowser();
+	CEdit m_accessToken;
+	CEdit m_tokenSecret;
+	CString m_accessTokenText;
+	CString m_tokenSecretText;
 };

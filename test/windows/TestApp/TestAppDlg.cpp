@@ -21,6 +21,8 @@
 
 CTestAppDlg::CTestAppDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TESTAPP_DIALOG, pParent)
+	, m_accessTokenText(_T(""))
+	, m_tokenSecretText(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -28,6 +30,10 @@ CTestAppDlg::CTestAppDlg(CWnd* pParent /*=nullptr*/)
 void CTestAppDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT5, m_accessToken);
+	DDX_Control(pDX, IDC_EDIT6, m_tokenSecret);
+	DDX_Text(pDX, IDC_EDIT5, m_accessTokenText);
+	DDX_Text(pDX, IDC_EDIT6, m_tokenSecretText);
 }
 
 BEGIN_MESSAGE_MAP(CTestAppDlg, CDialogEx)
@@ -49,6 +55,7 @@ BOOL CTestAppDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -100,7 +107,7 @@ void CTestAppDlg::OnBnClickedBtnwebbrowser()
 	platform.browserFrame.events.onAfterPageLoad = NULL;
 	platform.browserFrame.events.onError = NULL;
 
-	platform.browserFrame.ShowBrowserFrame(&platform, GetModuleHandle(NULL), m_hWnd, TEXT("https://accounts-dev.autodesk.com"));
+	platform.browserFrame.ShowBrowserFrame(&platform, GetModuleHandle(NULL), m_hWnd, TEXT("http://accounts-dev.autodesk.com/Logon"));
 
 	platform.Unload(&platform);
 }

@@ -19,7 +19,7 @@ extern "C" pError_t HmacSha1(Platform_t* platform, pByte_t* dest, const size_t d
 	DWORD cbData(0), cbHash(0), cbHashObject(0);
 	pByte_t* pHashObject = nullptr;
 	pByte_t* pHash = nullptr;
-	pError_t ret = P_ERROR_CRYPT;
+	pError_t ret = P_SUCCESS;
 
 	__try {
 

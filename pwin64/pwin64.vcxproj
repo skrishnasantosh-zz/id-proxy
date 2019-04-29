@@ -143,6 +143,7 @@
     <ClCompile Include="InPlaceSite.cpp" />
     <ClCompile Include="PlatformInit.cpp" />
     <ClCompile Include="Storage.cpp" />
+    <ClCompile Include="WebRequest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Browser.h" />

@@ -40,6 +40,7 @@
 #define P_ERROR_INVALIDLENGTH P_ERROR(-0x0102)
 #define P_ERROR_DESTTOOSMALL (-0x0103)
 #define P_ERROR_PLATFORM_UNINIT P_ERROR(-0x0104)
+#define P_ERROR_MALLOC_FAILED P_ERROR(-0x0105)
 #define P_ERROR_SYSTEM P_ERROR(-0x0105)
 
 #define P_ERROR_LIBLOAD P_ERROR(-0x03)
@@ -142,12 +143,7 @@ extern "C" {
 		void* _internal;
 	};
 
-	////Url
-	struct Url
-	{
-		pError_t(*UrlEncode)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char16_t* url);
-		pError_t(*UrlDecode)(struct _platform_t* platform, char16_t* dest, const size_t destSize, const char16_t* url);
-	};
+	
 
 	////Crypto
 	struct Crypto
@@ -219,7 +215,19 @@ extern "C" {
 	{					
 		pError_t(*SendRequest)(struct _platform_t* platform, int httpRequestType, const wchar_t* url, struct HttpHeader* headers, size_t headerCount, void* body, size_t bodySize, void* response, size_t responseBufferSize, size_t *responseSize);
 		pError_t(*SendRequestAsync)(struct _platform_t* platform, int httpRequestType, const wchar_t* url, struct HttpHeader* headers, size_t headerCount, void* body, size_t bodySizem, pfnWebRequestCallBack_t callback);
+
 		
+		pError_t(*Unload)(struct _platform_t* platform);
+		void* _internal;
+	};
+
+	struct HttpHelpers
+	{
+		pError_t(*Base64Encode)(struct _platform_t* platform, pByte_t* dest, const size_t destSize, const pByte_t* str, const size_t strSize);
+		pError_t(*Base64Decode)(struct _platform_t* platform, pByte_t* dest, const size_t destSize, const pByte_t* str, const size_t strSize);
+		pError_t(*UrlEncode)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const wchar_t* url, const size_t urlSize);
+		pError_t(*UrlDecode)(struct _platform_t* platform, wchar_t* dest, const size_t destSize, const wchar_t* url, const size_t urlSize);
+
 		pError_t(*Unload)(struct _platform_t* platform);
 		void* _internal;
 	};
@@ -230,7 +238,7 @@ extern "C" {
 		struct WebBrowserFrame browserFrame;		
 		struct WebRequest webRequest;
 		struct Strings strings;
-		struct Url url;
+		struct HttpHelpers httpHelpers;
 		struct Logger logger;
 		struct Crypto crypto;
 
